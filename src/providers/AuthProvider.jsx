@@ -1,9 +1,10 @@
 import { createContext, useEffect, useState } from "react";
 import app from "../firebase/firebase.config";
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 
 export const AuthContext = createContext();
-const auth = getAuth(app)
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider()
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -19,6 +20,11 @@ const AuthProvider = ({ children }) => {
         return signInWithEmailAndPassword(auth, email, password)
     }
 
+    const googleSignIn = () => {
+        setLoading(true);
+        return signInWithPopup(auth, googleProvider)
+    }
+
     const logOut = () => {
         setLoading(true);
         return signOut(auth)
@@ -29,6 +35,28 @@ const AuthProvider = ({ children }) => {
             setUser(currentUser)
             // console.log('current User', currentUser);
             setLoading(false)
+            if (currentUser && currentUser.email) {
+                const loggedUser = {
+                    email: currentUser?.email
+                }
+                fetch('http://localhost:6500/jwt', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(loggedUser)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data)
+                        // localStorage is not the best (2nd best) to store access token
+                        localStorage.setItem('access-token', data.token)
+
+                    })
+            }
+            else {
+                localStorage.removeItem('access-token')
+            }
         })
         return () => {
             unSubscribe();
@@ -40,6 +68,7 @@ const AuthProvider = ({ children }) => {
         loading,
         createUser,
         signIn,
+        googleSignIn,
         logOut
     }
 
