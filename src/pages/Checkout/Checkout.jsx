@@ -28,7 +28,7 @@ const Checkout = () => {
         }
         console.log(booking);
 
-        fetch('http://localhost:6500/booking', {
+        fetch('https://car-doctor-server-theta-eight.vercel.app/booking', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'

@@ -25,7 +25,7 @@ const Book = ({ books, handleDelete, handleBookingConfirm }) => {
             <td>${price}</td>
             <th>
                 {
-                    status === "Confirm" ? <span className='font-bold text-purple-500'>Confirmed</span> :
+                    status === "confirm" ? <span className='font-bold text-purple-500'>Confirmed</span> :
                         <button onClick={() => handleBookingConfirm(_id)} className="btn btn-ghost btn-xs">Please Confirm</button>
                 }
             </th>
